@@ -155,11 +155,57 @@ Last, but not less important, a second goal for this on-sync period is:
 - The **environmental requirements for next major version** [must be agreed and resolved so they can land to main](./release#2-weeks-after) early in the process, remaining defined and stable over the next, 6 months of, development cycle.
 As part of the standard [Moodle release process](./release), at the beginning of the on-sync period, we "unhold" all bugs that were held during the last week before the release because they were unrelated to the release. At the end of the onsync period we "unhold" all new features that were submitted after the code freeze for the the release.
 
-## Fixing issues identified during integration review/ testing
+## Fixing issues identified during integration review
+Once an issue has entered the "In integration review" stage, you must not modify the existing commit history of your branch.
+This means:
 
-When a branch has been merged by an integrator, it is important that you do not modify the existing history of your branch (e.g. by amending or squashing your commits) and instead add new commits on top. If you modify the history of your branch, it makes it extremely difficult for the integrator to merge your changes (and see the differences).
+- Do not amend commits
+- Do not squash commits
+- Do not rebase or force-push updated history
 
-As a general rule, this means that if your issue has entered the 'in integration review' stage of the development process, please only add new commits on top of your existing commits. There are circumstances when your issue will be 'in integration review' but not merged (and thus possible to squash changes) but if in any doubt, please add new commits and ask the integrator to squash your changes for you.
+Rewriting history makes it difficult for integrators to verify what has changed since the last review.
+
+#### What to do instead
+
+Add new commits on top of the existing branch, using FIXUP! commit messages wherever appropriate. These commits make it clear which changes are follow-ups to earlier commits. For example:
+```console
+commit a1b2c3d MDL-12345 First implementation of feature
+commit d4e5f6a MDL-12345 Add missing unit tests
+commit 12ab34f FIXUP! Address review feedback: fix coding style
+commit 56cd78e FIXUP! Adjust logic after integration testing
+```
+
+## Fixing issues after integration (when problems are found during testing)
+
+After the issue is merged, the workflow shifts. From that moment on, do not modify the original development branch. Instead, use the following process: 
+
+### 1. Create a new branch for the fix
+
+Use the format: MDL-12345-main-fix and base this branch on the merged branch (i.e., the branch as it exists in the integration.git repository).
+
+### 2. Add your fix as a new commit
+
+- Do not rebase or modify the previously integrated branch
+- Do not force push changes to the old development branch
+- If the original branch cannot be reused (e.g., conflicts), create the new branch based on the latest integration state
+- The integrator will cherry-pick the fix commits where appropriate
+
+### 3. Comment on the issue
+After creating a branch and fixing the issue, please add a comment to the failed ticket including the following details:
+
+- GitHub repository URL
+- Branch name
+- Link to the diff
+- Commit hash
+
+Example:
+
+```console
+Repository: github.com/username/moodle.git
+Branch: MDL-12345-main-fix
+Diff: https://github.com/username/moodle/compare/MDL-12345-main...MDL-12345-main-fix
+Commit: abcd1234ef567890
+```
 
 ## Commit squashing
 
